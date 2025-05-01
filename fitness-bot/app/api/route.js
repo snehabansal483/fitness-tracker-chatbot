@@ -50,6 +50,19 @@ const prompts = [
   "Would you like to see a summary of your weekly fitness progress?"
 ];
 
+async function waitForPrediction(id) {
+  let prediction;
+  for (let i = 0; i < 20; i++) { // 20 retries max (20 * 1.5s = 30 sec)
+    prediction = await replicate.predictions.get(id);
+    console.log(`Poll ${i + 1}: Prediction status:`, prediction.status);
+    if (prediction.status === "succeeded" || prediction.status === "failed" || prediction.status === "canceled") {
+      break;
+    }
+    await new Promise((res) => setTimeout(res, 1500)); // wait 1.5 sec
+  }
+  return prediction;
+}
+
 export async function POST(request) {
   try {
     if (!process.env.REPLICATE_API_TOKEN) {
@@ -63,31 +76,27 @@ export async function POST(request) {
     }
 
     const { prompt, consent } = await request.json();
-    console.log(
-      "Received request with prompt:",
-      prompt,
-      "and consent:",
-      consent
-    );
+    console.log("Received request with prompt:", prompt, "and consent:", consent);
 
     const options = {
-      version:
-        "f1d50bb24186c52daae319ca8366e53debdaa9e0ae7ff976e918df752732ccc4",
-      input: { 
-        prompt,
-      }
+      version: "f1d50bb24186c52daae319ca8366e53debdaa9e0ae7ff976e918df752732ccc4",
+      input: { prompt },
     };
+
     if (WEBHOOK_HOST) {
       options.webhook = `${WEBHOOK_HOST}/api/webhooks`;
       options.webhook_events_filter = ["start", "completed"];
     }
+
     const resp = await replicate.predictions.create(options);
-    console.log("created prediction id");
+    console.log("Created prediction id");
+
     if (resp?.error) {
       return NextResponse.json({ detail: resp.error }, { status: 500 });
     }
+
     const id = resp.id;
-    console.log(id);
+    console.log("Prediction ID:", id);
 
     if (!id) {
       return NextResponse.json(
@@ -96,29 +105,47 @@ export async function POST(request) {
       );
     }
 
-    let prediction = await replicate.predictions.get(id);
+    // 🔥 Poll until prediction finishes
+    let prediction = await waitForPrediction(id);
 
-    console.log("fetched-resp");
+    console.log("Final prediction object:", JSON.stringify(prediction, null, 2));
+
     if (prediction?.error) {
       return NextResponse.json({ detail: prediction.error }, { status: 500 });
     }
+
+    if (prediction.status !== "succeeded") {
+      return NextResponse.json(
+        { detail: "Prediction did not complete successfully.", status: prediction.status },
+        { status: 500 }
+      );
+    }
+
+    const botResponse = Array.isArray(prediction.output)
+      ? prediction.output.join("")
+      : prediction.output || "No output";
+
     if (consent === true) {
       const db = await connectToDatabase();
-      console.log("db connected");
+      console.log("DB connected");
+
       const result = await db.collection("fitness").insertOne({
         id,
         prompt: prompt,
-        response: prediction.output.join(""),
+        response: botResponse,
         timestamp: new Date(),
       });
       console.log("Chat interaction saved to database:", result);
     }
 
-    console.log("Bot response:", prediction);
+    console.log("Bot response:", botResponse);
 
-    return NextResponse.json(prediction, { status: 200 });
+    return NextResponse.json(
+      { ...prediction, safe_output: botResponse },
+      { status: 200 }
+    );
   } catch (error) {
+    console.error("Error in POST handler:", error);
     return NextResponse.json({ detail: error.message }, { status: 500 });
   }
 }
-
