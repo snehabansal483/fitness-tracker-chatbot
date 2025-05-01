@@ -6,9 +6,10 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
-const WEBHOOK_HOST = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
+const WEBHOOK_HOST = process.env.URL
+  ? process.env.URL
   : process.env.NGROK_HOST;
+
 
 const client = new MongoClient(process.env.MONGODB_URI);
 
