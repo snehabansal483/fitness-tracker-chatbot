@@ -8,8 +8,10 @@
   status = 200
 
 [functions]
-  directory = ".next/server/pages/api"  # For Next.js API routes
+  directory = ".next/server/app/api"  # Correct for App Router
   node_bundler = "esbuild"  # Faster builds
+  runtime = "nodejs18.x"    # Recommended runtime
 
 [dev]
   framework = "next"  # Better local dev experience
+  autoLaunch = true   # Automatically open browser
