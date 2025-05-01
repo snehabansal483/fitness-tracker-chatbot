@@ -1,0 +1,15 @@
+[build]
+  command = "npm run build"
+  publish = ".next"  # For SSR/API routes
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[functions]
+  directory = ".next/server/pages/api"  # For Next.js API routes
+  node_bundler = "esbuild"  # Faster builds
+
+[dev]
+  framework = "next"  # Better local dev experience
