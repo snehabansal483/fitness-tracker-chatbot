@@ -12,7 +12,7 @@ export default function Home() {
     try {
       if (fOldMes) {
         setFOldMes(false);
-        const response = await fetch("http://localhost:3000/api");
+        const response = await fetch("/api");
         const data = await response.json();
         for (let i = 0; i < data.length; i++) {
           const interaction = data[i];
@@ -47,7 +47,7 @@ export default function Home() {
     setInput("");
   
     try {
-      const response = await fetch("http://localhost:3000/api", {
+      const response = await fetch("/api", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
