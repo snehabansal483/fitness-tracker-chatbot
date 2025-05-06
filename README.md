@@ -1,10 +1,11 @@
 # 🏃‍♀️ Fitness Tracker Chatbot
 
-![Fitness Chatbot Screenshot](Screenshots/main.png)  
-
 ## 📖 Overview
 
 A **Next.js-based fitness tracking chatbot** that helps users log workouts, track progress, and get fitness recommendations. The chatbot uses **Replicate's AI model** for natural language processing and **MongoDB** for data persistence.
+
+## 🖼️ Fitness Chatbot Screenshot
+![Fitness Chatbot Screenshot](Screenshots/main.png)  
 
 ## 🌐 Live Demo
 
@@ -106,7 +107,7 @@ fitness-tracker-chatbot/
 
 ## 🖼️ Chat Interface Screenshot
 
-![Chat Interface Screenshot](Screenshots/interface.jpg)  
+![Chat Interface Screenshot](Screenshots/response.jpg)  
 
 ## 📡 API Endpoints
 
