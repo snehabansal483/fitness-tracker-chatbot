@@ -120,15 +120,7 @@ The easiest way to deploy this Next.js application is to use **Vercel**:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com)
 
-### 🌐 Live Demo
-
-Check out the live version here: [Fitness Chatbot on Vercel](https://fitness-tracker-chatbot.vercel.app/)
-
 ## 🤝 Contributing
 
 Contributions are welcome!  
 Please open a [new issue](https://github.com/snehabansal483/fitness-tracker-chatbot/issues/new) or submit a pull request.
-
-## 📄 License
-
-This project is licensed under the MIT License.
